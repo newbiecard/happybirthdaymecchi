@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Happy Birthday, Melisa 🤍 | Hadiah Digital Spesial</title>
+  <!-- Google Fonts & Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&family=Playfair+Display:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      cursor: none;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0a1a;
+      color: #f0eef7;
+      overflow-x: hidden;
+      transition: background 0.3s ease, color 0.2s ease;
+    }
+
+    /* Custom Cursor */
+    .cursor {
+      width: 24px;
+      height: 24px;
+      border: 2px solid #ffb7c5;
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.1s ease;
+      backdrop-filter: invert(0.2);
+      transform: translate(-50%, -50%);
+    }
+    .cursor-follower {
+      width: 8px;
+      height: 8px;
+      background: #ff99aa;
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.15s ease;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Dark/Light Mode */
+    body.light {
+      background: #fff5f7;
+      color: #1e1a2f;
+    }
+    body.light .glass-card, body.light .msg-card, body.light .timeline-card, body.light .nav-controls {
+      background: rgba(255, 245, 247, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 180, 200, 0.6);
+    }
+    body.light .gallery-item {
+      background: rgba(0,0,0,0.05);
+    }
+
+    /* Loader */
+    .loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0a0a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      transition: opacity 1s ease;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .loader p {
+      font-size: 1.2rem;
+      letter-spacing: 2px;
+      font-weight: 300;
+    }
+    .spinner {
+      width: 55px;
+      height: 55px;
+      border: 4px solid rgba(255, 180, 200, 0.3);
+      border-top: 4px solid #ff99bb;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Navigasi Next/Prev */
+    .nav-controls {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 25px;
+      background: rgba(10, 10, 26, 0.6);
+      backdrop-filter: blur(20px);
+      padding: 12px 28px;
+      border-radius: 60px;
+      z-index: 200;
+      border: 1px solid rgba(255, 170, 200, 0.4);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .nav-btn {
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      color: #ffb7c5;
+      cursor: pointer;
+      transition: 0.2s;
+      padding: 8px 18px;
+      border-radius: 40px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-btn:hover {
+      background: #ffb7c5;
+      color: #1e1a2f;
+      transform: scale(1.05);
+      box-shadow: 0 0 12px #ff99aa;
+    }
+    .page-indicator {
+      font-size: 0.9rem;
+      font-weight: 500;
+      background: rgba(0,0,0,0.5);
+      padding: 4px 14px;
+      border-radius: 50px;
+      letter-spacing: 1px;
+    }
+
+    /* Page Container */
+    .page {
+      min-height: 100vh;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      padding: 80px 5% 100px 5%;
+      position: relative;
+    }
+    .page.active {
+      display: block;
+      opacity: 1;
+      animation: pageFade 0.8s ease;
+    }
+    @keyframes pageFade {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    section {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 3.8rem;
+      font-family: 'Playfair Display', serif;
+      background: linear-gradient(135deg, #FFDEE9, #FFB7C5, #E0C3FF);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 20px;
+    }
+    h2 {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .hero {
+      min-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    .typing {
+      font-size: 1.6rem;
+      border-right: 2px solid #ffb7c5;
+      white-space: nowrap;
+      overflow: hidden;
+      width: 0;
+      animation: typing 3.5s steps(40, end) forwards, blink 0.7s infinite;
+    }
+    @keyframes typing { from { width: 0; } to { width: 100%; } }
+    @keyframes blink { 50% { border-color: transparent; } }
+
+    .btn {
+      background: rgba(255, 183, 197, 0.15);
+      border: 1.5px solid #ffb7c5;
+      padding: 14px 34px;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #ffb7c5;
+      margin-top: 35px;
+      transition: 0.3s;
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #ffb7c5;
+      color: #1e1a2f;
+      box-shadow: 0 0 20px #ff99aa;
+      transform: scale(1.05);
+    }
+    .countdown {
+      margin-top: 30px;
+      font-size: 1.2rem;
+      background: rgba(0,0,0,0.4);
+      padding: 12px 24px;
+      border-radius: 50px;
+      backdrop-filter: blur(5px);
+    }
+
+    /* Gallery */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 28px;
+    }
+    .gallery-item {
+      background: rgba(255,255,245,0.06);
+      border-radius: 28px;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 270px;
+      object-fit: cover;
+      transition: 0.5s;
+    }
+    .gallery-item:hover {
+      transform: translateY(-12px);
+      box-shadow: 0 25px 35px -12px rgba(0,0,0,0.6);
+    }
+    .gallery-item p {
+      padding: 16px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    /* Modal */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+      visibility: hidden;
+      opacity: 0;
+      transition: 0.25s;
+    }
+    .modal.active {
+      visibility: visible;
+      opacity: 1;
+    }
+    .modal-content {
+      max-width: 85%;
+      max-height: 85%;
+      background: rgba(20, 15, 45, 0.95);
+      border-radius: 32px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    /* Message Card */
+    .msg-card {
+      background: rgba(20, 15, 40, 0.7);
+      backdrop-filter: blur(16px);
+      border-radius: 48px;
+      padding: 50px 40px;
+      margin: 40px auto;
+      max-width: 800px;
+      border: 1px solid rgba(255, 190, 210, 0.5);
+      text-align: center;
+    }
+    .floating-hearts {
+      position: relative;
+      height: 80px;
+      margin-top: 30px;
+    }
+
+    /* Timeline */
+    .timeline {
+      position: relative;
+      max-width: 850px;
+      margin: 0 auto;
+    }
+    .timeline-item {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 45px;
+      opacity: 0;
+      transform: translateY(35px);
+      transition: 0.7s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+    .timeline-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .timeline-card {
+      background: rgba(30, 20, 50, 0.6);
+      backdrop-filter: blur(8px);
+      border-radius: 28px;
+      padding: 22px;
+      flex: 1;
+      border: 1px solid rgba(255,200,210,0.3);
+    }
+
+    /* Gift Box */
+    .gift-box {
+      width: 200px;
+      height: 200px;
+      background: linear-gradient(145deg, #f3a5b7, #ffc0d0);
+      margin: 30px auto;
+      border-radius: 28px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 0 25px #ffb7c5;
+    }
+    .gift-box:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 45px #ff99bb;
+    }
+
+    /* Background Particles */
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Side Tools */
+    .side-tools {
+      position: fixed;
+      top: 25px;
+      right: 25px;
+      display: flex;
+      gap: 12px;
+      z-index: 200;
+    }
+    .icon-btn {
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,183,197,0.5);
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #ffb7c5;
+      font-size: 1.3rem;
+      transition: 0.2s;
+    }
+    .icon-btn:hover {
+      background: #ffb7c5;
+      color: #1e1a2f;
+      transform: scale(1.1);
+    }
+
+    @media (max-width: 700px) {
+      h1 { font-size: 2.2rem; }
+      h2 { font-size: 1.9rem; }
+      .typing { font-size: 1.1rem; white-space: normal; border-right: none; animation: none; width: 100%; text-align: center; }
+      .nav-btn span { display: none; }
+      .nav-btn { padding: 8px 15px; }
+      .nav-controls { gap: 15px; padding: 10px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="loader" id="loader">
+    <div class="spinner"></div>
+    <p>✨ menyiapkan kejutan spesial untuk Melisa ✨</p>
+  </div>
+  <div class="cursor"></div>
+  <div class="cursor-follower"></div>
+
+  <!-- Side Tools -->
+  <div class="side-tools">
+    <div class="icon-btn" id="darkToggle"><i class="fas fa-moon"></i></div>
+    <div class="icon-btn" id="musicToggle"><i class="fas fa-volume-up"></i></div>
+  </div>
+
+  <!-- 6 Halaman -->
+  <!-- Halaman 1: Home -->
+  <div id="page1" class="page active">
+    <div class="hero">
+      <h1>Selamat Ulang Tahun, <span id="bdayName">Melisa Rahmawati</span> 💖</h1>
+      <div class="typing" id="typingText">Cahaya terindah dalam hidupku...</div>
+      <button class="btn" id="startJourneyBtn">✨ Mulai Perjalanan ✨</button>
+      <div class="countdown" id="countdownEl"></div>
+    </div>
+  </div>
+
+  <!-- Halaman 2: Kenangan -->
+  <div id="page2" class="page">
+    <section><h2>🌸 Kenangan Manis Bersamamu 🌸</h2>
+    <div class="gallery-grid" id="galleryGrid"></div></section>
+  </div>
+
+  <!-- Halaman 3: Surat Cinta -->
+  <div id="page3" class="page">
+    <section><div class="msg-card">
+      <i class="fas fa-heart" style="font-size: 3rem; color:#ffb7c5;"></i>
+      <h3 style="margin: 20px 0;">Untuk Melisa, Belahan Jiwaku</h3>
+      <div id="typedMessage" style="font-size:1.2rem; line-height:1.7; text-align:left;"></div>
+      <div class="floating-hearts" id="heartsContainer"></div>
+    </div></section>
+  </div>
+
+  <!-- Halaman 4: Timeline -->
+  <div id="page4" class="page">
+    <section><h2>🌟 Perjalanan Cinta Kita 🌟</h2>
+    <div class="timeline" id="timelineList"></div></section>
+  </div>
+
+  <!-- Halaman 5: Kejutan -->
+  <div id="page5" class="page">
+    <section style="text-align:center;">
+      <h2>🎁 Buka Kejutan Spesial 🎁</h2>
+      <div class="gift-box" id="giftBox"><i class="fas fa-gift" style="font-size: 4.5rem; color:#fff0b5;"></i></div>
+      <div id="surpriseReveal" style="margin-top: 30px;"></div>
+    </section>
+  </div>
+
+  <!-- Halaman 6: Penutup -->
+  <div id="page6" class="page">
+    <section style="text-align:center; min-height: 80vh; display: flex; flex-direction: column; justify-content: center;">
+      <h2>✨ Untuk Selamanya ✨</h2>
+      <p style="font-size: 1.7rem; margin: 20px 0; font-weight: 300;">"Terima kasih telah menjadi warna dalam hidupku. I love you more than words can say."</p>
+      <button class="btn" id="replayBtn">⟳ Putar Ulang Keajaiban</button>
+      <div id="lanternArea" style="margin-top: 40px; position: relative; height: 100px;"></div>
+    </section>
+  </div>
+
+  <!-- Navigasi Next/Prev -->
+  <div class="nav-controls">
+    <button class="nav-btn" id="prevBtn"><i class="fas fa-chevron-left"></i> <span>Sebelum</span></button>
+    <div class="page-indicator" id="pageIndicator">1 / 6</div>
+    <button class="nav-btn" id="nextBtn"><span>Berikut</span> <i class="fas fa-chevron-right"></i></button>
+  </div>
+
+  <audio id="bgMusic" loop preload="auto">
+    <source src="audio/untilifoundyou.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    // ---------- KONFIGURASI UNTUK MELISA ----------
+    const NAMA_PACAR = "Melisa Rahmawati";
+    const TANGGAL_LAHIR = new Date(2008, 4, 14); // 14 Mei 2008 (bulan dimulai dari 0 = Januari, jadi 4 = Mei)
+    
+    // Surat yang lebih menyentuh dalam Bahasa Indonesia
+    const SURAT_CINTA = "Hallo sayangku Melisa 🤍\n\nSelamat ulang tahun yang ke-18 yaa. Di hari spesial kamu ini, aku cuma pengen bilang kalau kamu itu orang yang sangat berarti buat aku. Kehadiran kamu selalu bikin hari-hariku jadi lebih baik.\n\nDi umur kamu yang sekarang, aku berharap semua hal baik datang ke hidup kamu. Semoga apa yang kamu cita-citain bisa tercapai, selalu sehat, bahagia, dan dikelilingi orang-orang yang sayang sama kamu.\n\nMakasih ya udah selalu ada dan jadi bagian penting di hidup aku. Aku seneng bisa punya banyak cerita dan waktu bareng kamu sampai sekarang.\n\nSekali lagi, happy birthday cantik ✨\n\nDengan segenap hati,\nPacarmu yang selalu merindukanmu 🤍";
+    
+    const DATA_TIMELINE = [
+      { icon: "fa-star", title: "Pertama Kali Melihatmu", desc: "Saat pertama kali melihat senyummu, aku tahu hatiku bergetar." },
+      { icon: "fa-moon", title: "Bermimpi Bersamamu", desc: "Kita berbagi mimpi dan harapan di bawah langit yang sama." },
+      { icon: "fa-camera", title: "Setiap Momen Berharga", desc: "Setiap foto menyimpan cerita tentang tawa dan cinta kita." },
+      { icon: "fa-cake-candles", title: "Hari Spesialmu", desc: "Dan hari ini, seluruh alam semesta ikut merayakan dirimu, Melisa." }
+    ];
+    
+    const GALERI_GAMBAR = [
+      "/img/foto1.jpg", "/img/foto2.jpg", "/img/foto3.jpg",
+      "/img/foto4.jpg"
+    ];
+    const CAPTIONS_GALERI = ["Senyummu seperti mentari", "Wajah Lucu mu", "Kita berdua 🤍", "Mata yang berbinar"];
+
+    // ---------- LOGIKA NAVIGASI ----------
+    let currentIndex = 0;
+    const totalPages = 6;
+    const pages = [document.getElementById("page1"), document.getElementById("page2"), document.getElementById("page3"), document.getElementById("page4"), document.getElementById("page5"), document.getElementById("page6")];
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const pageIndicator = document.getElementById("pageIndicator");
+
+    function updatePageVisibility() {
+      pages.forEach((pg, idx) => {
+        pg.classList.remove("active");
+        pg.style.display = "none";
+      });
+      pages[currentIndex].style.display = "block";
+      setTimeout(() => pages[currentIndex].classList.add("active"), 10);
+      pageIndicator.innerText = `${currentIndex+1} / ${totalPages}`;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      
+      // Trigger konten dinamis saat halaman aktif
+      if(currentIndex === 3) initTimelineScroll();
+      if(currentIndex === 1 && document.getElementById("galleryGrid").children.length === 0) buildGallery();
+      if(currentIndex === 2) startTypingMessage();
+      if(currentIndex === 5) createLanterns();
+    }
+
+    function nextPage() { if(currentIndex < totalPages-1) { currentIndex++; updatePageVisibility(); } }
+    function prevPage() { if(currentIndex > 0) { currentIndex--; updatePageVisibility(); } }
+
+    prevBtn.addEventListener("click", prevPage);
+    nextBtn.addEventListener("click", nextPage);
+    document.getElementById("startJourneyBtn").addEventListener("click", () => { currentIndex = 1; updatePageVisibility(); });
+    document.getElementById("replayBtn")?.addEventListener("click", () => { currentIndex = 0; updatePageVisibility(); });
+
+    // Hitung countdown menuju 14 Mei
+    function updateCountdown() {
+      const today = new Date();
+      let nextBirthday = new Date(today.getFullYear(), 4, 14);
+      if(today > nextBirthday) nextBirthday.setFullYear(today.getFullYear() + 1);
+      const diff = nextBirthday - today;
+      const days = Math.floor(diff/(1000*60*60*24));
+      const hours = Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+      const el = document.getElementById("countdownEl");
+      if(el) el.innerHTML = `🎂 ${days} hari & ${hours} jam menuju hari spesialmu, Melisa 🎂`;
+    }
+    setInterval(updateCountdown, 3600000);
+    updateCountdown();
+    document.getElementById("bdayName").innerHTML = `${NAMA_PACAR} 💕`;
+
+    // Typing Surat di Halaman 3
+    function startTypingMessage() {
+      const container = document.getElementById("typedMessage");
+      if(!container) return;
+      if(container.innerHTML !== "") return;
+      container.innerHTML = "";
+      let i = 0;
+      function typeWriter() {
+        if(i < SURAT_CINTA.length) {
+          container.innerHTML += SURAT_CINTA.charAt(i);
+          i++;
+          setTimeout(typeWriter, 35);
+        } else {
+          generateFloatingHearts();
+        }
+      }
+      typeWriter();
+    }
+    
+    function generateFloatingHearts() {
+      const heartsDiv = document.getElementById("heartsContainer");
+      if(!heartsDiv) return;
+      setInterval(() => {
+        const heart = document.createElement("i");
+        heart.classList.add("fas", "fa-heart");
+        heart.style.position = "absolute";
+        heart.style.left = Math.random() * 90 + "%";
+        heart.style.bottom = "0px";
+        heart.style.color = "#ff99cc";
+        heart.style.fontSize = Math.random() * 20 + 16 + "px";
+        heart.style.opacity = "0.9";
+        heart.style.animation = "floatHeart 4s ease-out forwards";
+        heartsDiv.appendChild(heart);
+        setTimeout(() => heart.remove(), 4000);
+      }, 900);
+    }
+    
+    const heartKeyframe = document.createElement("style");
+    heartKeyframe.textContent = `@keyframes floatHeart { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-180px) scale(1.2); opacity: 0; } }`;
+    document.head.appendChild(heartKeyframe);
+
+    // Galeri Kenangan
+    function buildGallery() {
+      const grid = document.getElementById("galleryGrid");
+      if(grid.children.length) return;
+      GALERI_GAMBAR.forEach((src, idx) => {
+        const item = document.createElement("div");
+        item.className = "gallery-item";
+        item.innerHTML = `<img src="${src}" alt="kenangan" loading="lazy"><p>📷 ${CAPTIONS_GALERI[idx % CAPTIONS_GALERI.length]}</p>`;
+        item.addEventListener("click", () => {
+          const modalDiv = document.createElement("div");
+          modalDiv.className = "modal";
+          modalDiv.innerHTML = `<div class="modal-content"><img src="${src}" style="width:100%; border-radius: 20px;"><p style="margin-top:12px;">🤍 ${CAPTIONS_GALERI[idx % CAPTIONS_GALERI.length]} 🤍</p><button class="btn" style="margin-top:15px;">Tutup</button></div>`;
+          document.body.appendChild(modalDiv);
+          setTimeout(() => modalDiv.classList.add("active"), 20);
+          modalDiv.querySelector("button").onclick = () => modalDiv.remove();
+        });
+        grid.appendChild(item);
+      });
+    }
+
+    // Timeline dengan animasi scroll
+    function initTimelineScroll() {
+      const timelineContainer = document.getElementById("timelineList");
+      if(timelineContainer.children.length === 0) {
+        DATA_TIMELINE.forEach(item => {
+          const div = document.createElement("div");
+          div.className = "timeline-item";
+          div.innerHTML = `<div class="glass-icon" style="font-size:2rem;"><i class="fas ${item.icon}"></i></div><div class="timeline-card"><h3>${item.title}</h3><p>${item.desc}</p></div>`;
+          timelineContainer.appendChild(div);
+        });
+      }
+      const items = document.querySelectorAll(".timeline-item");
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if(entry.isIntersecting) entry.target.classList.add("visible"); });
+      }, { threshold: 0.3 });
+      items.forEach(i => observer.observe(i));
+    }
+
+    // Kejutan dan Confetti
+    function burstConfetti() {
+      if(typeof canvasConfetti === "function") {
+        canvasConfetti({ particleCount: 200, spread: 110, origin: { y: 0.6 }, colors: ['#ffb7c5', '#ffe6a3', '#c0a0ff', '#ff99aa'] });
+        canvasConfetti({ particleCount: 100, angle: 70, spread: 80, origin: { x: 0.2, y: 0.7 } });
+        canvasConfetti({ particleCount: 100, angle: 110, spread: 80, origin: { x: 0.8, y: 0.7 } });
+      }
+    }
+    
+    const gift = document.getElementById("giftBox");
+    if(gift) {
+      gift.addEventListener("click", () => {
+        const revealDiv = document.getElementById("surpriseReveal");
+        revealDiv.innerHTML = `<div style="background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); border-radius: 48px; padding: 28px; animation: fadeScale 0.4s;">
+          <i class="fas fa-music" style="font-size: 55px; color:#ffb7c5;"></i>
+          <p style="margin: 18px 0; font-size:1.2rem;">🎵 Untukmu Melisa, lagu dari hatiku 🎵</p>
+          <div style="background:#1e1a2f; padding:14px; border-radius:40px; margin:10px 0;"><i class="fas fa-play-circle"></i> "Kamu adalah rumah bagiku"</div>
+          <p style="margin-top:20px;">💖 TERBUKALAH KEJUTANNYA 💖</p>
+          <p style="font-size:0.95rem;">Aku menyiapkan semua ini untukmu karena kamu sangat berarti... Selamat ulang tahun, cintaku.</p>
+        </div>`;
+        burstConfetti();
+        gift.style.transform = "scale(1.2)";
+        setTimeout(() => gift.style.transform = "", 500);
+      });
+    }
+
+    // Lentera di halaman final
+    function createLanterns() {
+      const lanternDiv = document.getElementById("lanternArea");
+      if(!lanternDiv || lanternDiv.children.length > 5) return;
+      for(let i=0;i<14;i++) {
+        let lantern = document.createElement("i");
+        lantern.className = "fas fa-crown";
+        lantern.style.position = "absolute";
+        lantern.style.left = Math.random() * 100 + "%";
+        lantern.style.top = Math.random() * 100 + "%";
+        lantern.style.animation = `floatLantern ${5 + Math.random() * 7}s infinite ease-in-out`;
+        lantern.style.opacity = 0.5;
+        lantern.style.color = "#ffccdd";
+        lantern.style.fontSize = "1.6rem";
+        lantern.style.pointerEvents = "none";
+        lanternDiv.appendChild(lantern);
+      }
+    }
+    
+    const floatFrame = document.createElement("style");
+    floatFrame.textContent = `@keyframes floatLantern { 0% { transform: translateY(0px) rotate(0deg); opacity: 0.2; } 50% { transform: translateY(-35px) rotate(6deg); opacity: 0.9; } 100% { transform: translateY(0px) rotate(0deg); opacity: 0.2; } }
+    @keyframes fadeScale { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:scale(1); } }`;
+    document.head.appendChild(floatFrame);
+
+    // Background particles
+    const canvasBg = document.getElementById("bg-canvas");
+    const bgCtx = canvasBg.getContext("2d");
+    let particles = [];
+    function resizeBg() { canvasBg.width = window.innerWidth; canvasBg.height = window.innerHeight; }
+    function initParticlesBg() {
+      particles = [];
+      for(let i=0;i<140;i++) {
+        particles.push({ x: Math.random()*canvasBg.width, y: Math.random()*canvasBg.height, r: Math.random()*2.2+1, alpha: Math.random()*0.5+0.2, dx: (Math.random()-0.5)*0.3, dy: (Math.random()-0.5)*0.2 });
+      }
+    }
+    function drawBgParticles() {
+      bgCtx.clearRect(0,0,canvasBg.width,canvasBg.height);
+      for(let p of particles) {
+        bgCtx.beginPath();
+        bgCtx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        bgCtx.fillStyle = `rgba(255, 200, 215, ${p.alpha})`;
+        bgCtx.fill();
+        p.x += p.dx;
+        p.y += p.dy;
+        if(p.x<0) p.x = canvasBg.width;
+        if(p.x>canvasBg.width) p.x=0;
+        if(p.y<0) p.y = canvasBg.height;
+        if(p.y>canvasBg.height) p.y=0;
+      }
+      requestAnimationFrame(drawBgParticles);
+    }
+    window.addEventListener("resize", () => { resizeBg(); initParticlesBg(); });
+
+    // Musik & Dark Mode
+    const musicAudio = document.getElementById("bgMusic");
+    let musicPlaying = false;
+    const musicBtn = document.getElementById("musicToggle");
+    musicBtn.addEventListener("click", () => {
+      if(musicAudio.paused) { musicAudio.play(); musicBtn.innerHTML = '<i class="fas fa-volume-up"></i>'; musicPlaying=true; }
+      else { musicAudio.pause(); musicBtn.innerHTML = '<i class="fas fa-volume-mute"></i>'; musicPlaying=false; }
+    });
+    document.body.addEventListener("click", () => {
+      if(musicAudio.paused && !musicPlaying) { musicAudio.play().catch(e=>console.log); musicPlaying=true; musicBtn.innerHTML = '<i class="fas fa-volume-up"></i>'; }
+    }, { once: true });
+    
+    const darkBtn = document.getElementById("darkToggle");
+    darkBtn.addEventListener("click", () => {
+      document.body.classList.toggle("light");
+      darkBtn.innerHTML = document.body.classList.contains("light") ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    });
+
+    // Loader & inisialisasi
+    window.addEventListener("load", () => {
+      setTimeout(() => { const l = document.getElementById("loader"); l.style.opacity = "0"; setTimeout(()=> l.style.display = "none", 1000); }, 1400);
+      resizeBg(); initParticlesBg(); drawBgParticles();
+      buildGallery();
+      initTimelineScroll();
+      
+      // Custom cursor
+      document.addEventListener("mousemove", (e) => {
+        document.querySelector(".cursor").style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+        document.querySelector(".cursor-follower").style.transform = `translate(${e.clientX-5}px, ${e.clientY-5}px)`;
+      });
+    });
+    
+    // Inject canvas-confetti
+    const confettiScript = document.createElement('script');
+    confettiScript.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1";
+    document.head.appendChild(confettiScript);
+  </script>
+</body>
+</html>
